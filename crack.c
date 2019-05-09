@@ -79,14 +79,14 @@ struct entry *read_dictionary(char *filename, int *size)
      *  2 - Check if file can be opened
      *  3 - Call stat to read file length
      */
+    int fLength = fileLength(filename);
     FILE *p = fopen(filename, "r");
     checkOpen(p , "Passwords File");
-    int fLength = fileLength(filename);
     
     /*  Part 2: Reading file into memory
      *  Steps - 
      *  1 - Allocate memory for entire file to be read
-     *  2 - Read file into memor
+     *  2 - Read file into memory
      *  3 - Close Password file, b/c we don't need it anymore
      *  4 - Format file just read into memory, keep track of # of lines
      *  5 - [DEBUG] - Print # of lines
@@ -94,6 +94,7 @@ struct entry *read_dictionary(char *filename, int *size)
     char * contents = malloc(fLength); 
     fread(contents, 1, fLength, p);
     fclose(p); 
+    
     int lines = 0; 
     for (int i = 0; i < fLength; i++)
     {
@@ -114,7 +115,7 @@ struct entry *read_dictionary(char *filename, int *size)
      d[0].hash = md5(contents, strlen(contents));
      
      //DEBUG PRINT STATEMENT
-     //printf("Count: [0], Guess: [%s], Hash: [%s] \n", d[0].guess, d[0].hash);
+     printf("Count: [0], Guess: [%s], Hash: [%s]\n", d[0].guess, d[0].hash);
      
      int count = 1; 
      
@@ -126,7 +127,7 @@ struct entry *read_dictionary(char *filename, int *size)
              d[count].hash = md5(d[count].guess, strlen(d[count].guess));
              
              //DEBUG PRINT STATEMENT 
-             //printf("Count: [%d], Guess: [%s], Hash: [%s] \n", count, d[count].guess, d[count].hash);
+             printf("Count: [%d], Guess: [%s], Hash: [%s]\n", count, d[count].guess, d[count].hash);
              count++; 
 
          }
@@ -134,6 +135,7 @@ struct entry *read_dictionary(char *filename, int *size)
 
     // Return # of lines which is size, and the dictionary
     *size = lines; 
+    //free(contents);
     return d;
     
 }
@@ -149,6 +151,10 @@ int main(int argc, char *argv[])
     
     // TODO: Sort the hashed dictionary using qsort.
     // You will need to provide a comparison function.
+    
+    //Store intial memory address which points to contents
+    char * start = dict[0].guess;
+    
     qsort(dict, dlen, sizeof(struct entry), dComp); 
 
     // TODO
@@ -190,9 +196,12 @@ int main(int argc, char *argv[])
     
     
     // Free allocated mem
+    // Free hashes
     for (int i = 0; i < dlen; i++) free(dict[i].hash);
-    //free(dict[0].guess);
+    // Free dictonary 
     free(dict);
+    // Free contents
+    free(start);
     
     //Close Hash File
     fclose(hashFile);
