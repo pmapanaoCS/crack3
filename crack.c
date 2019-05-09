@@ -177,26 +177,27 @@ int main(int argc, char *argv[])
         struct entry *found = bsearch(line, dict, dlen, sizeof(struct entry), dbComp);
         wordNum++;
         
-        
+        //Checks if bsearch found a match 
         if(found != NULL)
         {
             printf("FOUND MATCH: H:[%s] P:[%s]\n", line, found->guess);
             correctHashes++; 
-        }else continue; 
+        }
         
     }
     
     printf("The number of cracked passwords is: %d\n",correctHashes);
     
-    for (int i = 0; i < dlen; i++) free(dict[i].hash);
     
     // Free allocated mem
+    for (int i = 0; i < dlen; i++) free(dict[i].hash);
+    //free(dict[0].guess);
     free(dict);
+    
+    //Close Hash File
     fclose(hashFile);
     
     // Ensure proper pop of main stack
     return 0; 
-    
-    
     
 }
